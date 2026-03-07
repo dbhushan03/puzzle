@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>3x3 Picture Puzzle</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+margin:0;
+padding:0;
+
+background-image:url("https://raw.githubusercontent.com/dbhushan03/MyTracker-/e6237cd6d5e96801763c4604b4fd562a35f3ee54/Purple%20Puzzle.jpg");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+}
+
+h2{
+color:white;
+margin-top:20px;
+}
+
+#timer{
+font-size:22px;
+color:white;
+margin:10px;
+}
+
+#puzzle{
+width:300px;
+height:300px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+grid-template-rows:repeat(3,1fr);
+gap:2px;
+
+background:rgba(255,255,255,0.85);
+padding:5px;
+border-radius:10px;
+}
+
+.tile{
+width:100px;
+height:100px;
+background-size:300px 300px;
+border:1px solid #999;
+cursor:pointer;
+}
+
+.blank{
+background:none;
+border:1px dashed #aaa;
+}
+
+#solution{
+margin-top:20px;
+color:white;
+}
+
+#solution img{
+width:120px;
+border:2px solid white;
+border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>Picture Puzzle</h2>
+
+<div id="timer">Time: 0 sec</div>
+
+<div id="puzzle"></div>
+
+<div id="solution">
+<p>Solution Preview</p>
+<img id="solutionImg">
+</div>
+
+<script>
+
+const images=[
+
+"https://raw.githubusercontent.com/dbhushan03/MyTracker-/9029d98327fbfbe988b81ede3f7bab51cf79a8c0/WhatsApp%20Image%202026-03-06%20at%2011.00.18%20PM.jpeg",
+
+"https://picsum.photos/300?random=1",
+"https://picsum.photos/300?random=2",
+"https://picsum.photos/300?random=3"
+
+];
+
+let tiles=[];
+let blankIndex=8;
+let imgURL="";
+let seconds=0;
+let timerInterval;
+
+function startGame(){
+
+let randomIndex=Math.floor(Math.random()*images.length);
+imgURL=images[randomIndex];
+
+document.getElementById("solutionImg").src=imgURL;
+
+tiles=[];
+
+for(let i=0;i<9;i++){
+tiles.push(i);
+}
+
+shuffle();
+drawPuzzle();
+startTimer();
+}
+
+function startTimer(){
+
+seconds=0;
+
+clearInterval(timerInterval);
+
+timerInterval=setInterval(function(){
+
+seconds++;
+
+document.getElementById("timer").innerText="Time: "+seconds+" sec";
+
+},1000);
+
+}
+
+function shuffle(){
+
+for(let i=tiles.length-2;i>0;i--){
+
+let j=Math.floor(Math.random()*(i+1));
+
+let temp=tiles[i];
+tiles[i]=tiles[j];
+tiles[j]=temp;
+
+}
+
+tiles[8]=8;
+blankIndex=tiles.indexOf(8);
+
+}
+
+function drawPuzzle(){
+
+const puzzle=document.getElementById("puzzle");
+
+puzzle.innerHTML="";
+
+tiles.forEach((value,index)=>{
+
+let div=document.createElement("div");
+
+div.classList.add("tile");
+
+if(value===8){
+
+div.classList.add("blank");
+
+}else{
+
+let x=(value%3)*100;
+let y=Math.floor(value/3)*100;
+
+div.style.backgroundImage="url("+imgURL+")";
+div.style.backgroundPosition="-"+x+"px -"+y+"px";
+
+}
+
+div.onclick=function(){
+move(index);
+};
+
+puzzle.appendChild(div);
+
+});
+
+}
+
+function move(i){
+
+const validMoves=[i-1,i+1,i-3,i+3];
+
+if(validMoves.includes(blankIndex)){
+
+let temp=tiles[i];
+tiles[i]=tiles[blankIndex];
+tiles[blankIndex]=temp;
+
+blankIndex=i;
+
+drawPuzzle();
+
+checkWin();
+}
+
+}
+
+function checkWin(){
+
+for(let i=0;i<9;i++){
+
+if(tiles[i]!==i){
+return;
+}
+
+}
+
+clearInterval(timerInterval);
+
+setTimeout(function(){
+
+drawSolved();
+
+alert("🎉 Puzzle Solved in "+seconds+" seconds!");
+
+},200);
+
+}
+
+function drawSolved(){
+
+const puzzle=document.getElementById("puzzle");
+
+puzzle.innerHTML="";
+
+for(let i=0;i<9;i++){
+
+let div=document.createElement("div");
+
+div.classList.add("tile");
+
+let x=(i%3)*100;
+let y=Math.floor(i/3)*100;
+
+div.style.backgroundImage="url("+imgURL+")";
+div.style.backgroundPosition="-"+x+"px -"+y+"px";
+
+puzzle.appendChild(div);
+
+}
+
+}
+
+startGame();
+
+</script>
+
+</body>
+</html>
