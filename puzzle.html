@@ -1,261 +1,683 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>3x3 Picture Puzzle</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Proposal Challenge Puzzle — Romantic UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --pink:#ff4d88;
+    --deep:#6a11cb;
+    --accent:#ffb3d6;
+    --gold:#ffd166;
+    --card-text:#111;
+    --heart-color: #ff2d55; /* stronger red */
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;
+    background-image:
+      linear-gradient(180deg, rgba(255,77,136,0.12), rgba(106,17,203,0.08)),
+      url("https://raw.githubusercontent.com/dbhushan03/puzzle/main/puzzle-1-67589-540x1080-MM-80.webp");
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+    padding:28px 16px;
+    overflow-x:hidden;
+  }
 
-body{
-font-family:Arial;
-text-align:center;
-margin:0;
-padding:0;
+  header { text-align:center; width:100%; max-width:980px; }
+  h1{
+    margin:6px 0 0 0;
+    font-weight:800;
+    letter-spacing:0.6px;
+    font-size:30px;
+    background: linear-gradient(90deg,var(--pink),#ff7ab6 60%, #ffd166);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 8px 30px rgba(106,17,203,0.18);
+  }
+  .subtitle{
+    margin:6px 0 0 0;
+    font-weight:500;
+    color: rgba(255,255,255,0.95);
+    font-size:14px;
+  }
 
-background-image:url("https://raw.githubusercontent.com/dbhushan03/MyTracker-/e6237cd6d5e96801763c4604b4fd562a35f3ee54/Purple%20Puzzle.jpg");
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-}
+  .container{
+    width:100%;
+    max-width:980px;
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
 
-h2{
-color:white;
-margin-top:20px;
-}
+  /* left card */
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    backdrop-filter: blur(4px);
+    color: var(--card-text);
+    border-radius:18px;
+    padding:18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.06);
+    width:360px;
+    backdrop-filter: blur(6px) saturate(120%);
+    position:relative;
+    overflow:hidden;
+  }
 
-#timer{
-font-size:22px;
-color:white;
-margin:10px;
-}
+  /* decorative pattern */
+  .card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image: radial-gradient(rgba(255,77,136,0.02) 1px, transparent 1px);
+    background-size: 18px 18px;
+    pointer-events:none;
+    mix-blend-mode:overlay;
+  }
 
-#puzzle{
-width:300px;
-height:300px;
-margin:auto;
-display:grid;
-grid-template-columns:repeat(3,1fr);
-grid-template-rows:repeat(3,1fr);
-gap:2px;
+  #timer{ color:#222; font-weight:700; margin-bottom:10px; font-size:16px; }
 
-background:rgba(255,255,255,0.85);
-padding:5px;
-border-radius:10px;
-}
+  /* puzzle frame: replace plain white with warm textured card */
+  .puzzle-frame{
+    width:320px;
+    height:320px;
+    margin:0 auto;
+    border-radius:18px;
+    padding:5px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    backdrop-filter: blur(4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18), inset 0 6px 18px rgba(255,77,136,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
 
-.tile{
-width:100px;
-height:100px;
-background-size:300px 300px;
-border:1px solid #999;
-cursor:pointer;
-}
+  /* subtle background texture inside frame to remove stark white */
+  .puzzle-frame::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,77,136,0.02), transparent 6%),
+      linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+    pointer-events:none;
+    mix-blend-mode:overlay;
+  }
 
-.blank{
-background:none;
-border:1px dashed #aaa;
-}
+  /* inner puzzle area with warm toned background (not plain white) */
+  #puzzle{
+    width:100%;
+    height:100%;
+    border-radius:5px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(3,1fr);
+    gap:0;       /* no grid spacing */
+  	padding:0;   /* no inner spacing */
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border-radius:10px;
+    box-shadow: inset 0 6px 18px rgba(0,0,0,0.03);
+    position:relative;
+    overflow:hidden;
+  }
 
-#solution{
-margin-top:20px;
-color:white;
-}
+  /* tile style: add soft border, rounded corners, subtle shadow and warm tint */
+  .tile{
+    width:100%;
+    height:100%;
+    border-radius:1px;
+    background-size:320px 320px;
+    cursor:pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+    box-shadow: none;
+    background-repeat:no-repeat;
+    background-position:center;
+    border: none;
+    margin:0;
+    position:relative;
+    overflow:hidden;
+  }
+  .tile .tile-overlay{
+    position:absolute;
+    inset:0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+    pointer-events:none;
+  }
+  .tile:active{ transform: scale(.98) }
+  .blank{ background: transparent; cursor: default; box-shadow:none; border: none; }
 
-#solution img{
-width:120px;
-border:2px solid white;
-border-radius:5px;
-}
+  .controls{ display:flex; gap:10px; justify-content:center; margin-top:14px; }
+  button{
+    border: none; cursor:pointer; border-radius:999px; padding:10px 18px;
+    font-weight:700; color:white; background: linear-gradient(90deg,var(--pink),#ff7ab6);
+    box-shadow: 0 8px 20px rgba(255,77,136,0.18);
+  }
+  .hintBtn{ background: linear-gradient(90deg,#ffb84d,#ffaa00); color:#111; box-shadow: 0 8px 20px rgba(255,170,0,0.18) }
+  .mutedBtn{ background: #444; box-shadow:none; color:#fff; font-weight:700 }
 
+  .side{
+    width:420px; max-width:92%;
+    border-radius:16px; padding:18px; color:#fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.04);
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    backdrop-filter: blur(4px);
+  }
+
+  .previewTitle{ font-weight:700; margin:0 0 8px 0; color:#fff; }
+  .previewWrap{ width:100%; height:220px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; border: 2px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.06); }
+  .previewImg{ width:100%; height:100%; object-fit:contain; display:block; }
+
+  .meta{ font-size:14px; opacity:0.95; color: #ffeef8; margin-top:12px }
+
+  .modal{ display:none; position:fixed; inset:0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); z-index:1200; align-items:center; justify-content:center; padding:20px; }
+  .modalCard{
+    width:100%;
+    max-width:520px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.86));
+    color: var(--card-text);
+    border-radius:14px;
+    padding:22px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    text-align:center;
+    border: 1px solid rgba(255,77,136,0.08);
+    backdrop-filter: blur(8px) saturate(120%);
+  }
+  .modalCard h3{ margin:0 0 8px 0; font-size:20px; color:#222 }
+  .modalCard p{ margin:6px 0 14px 0; color:#333; line-height:1.35 }
+
+  .input{ width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(0,0,0,0.06); font-size:16px; margin-bottom:10px; }
+  .feedback{ min-height:20px; font-weight:700; margin-top:6px; }
+
+  .successTitle{ color:var(--pink); font-size:22px; margin:0 0 6px 0; text-shadow: 0 6px 18px rgba(255,77,136,0.18) }
+  .proposalBtn{ display:inline-block; margin-top:12px; padding:12px 20px; border-radius:12px; background: linear-gradient(90deg,#ffd166,#ffb3d6); color:#222; font-weight:800; font-size:16px; border:none; cursor:pointer; box-shadow: 0 12px 30px rgba(255,177,214,0.18); }
+
+  .firework{ position:fixed; width:10px; height:10px; border-radius:50%; pointer-events:none; z-index:1300; mix-blend-mode:screen; opacity:0.95; }
+
+  /* floating hearts (bigger and red) */
+  .heart {
+    position: fixed;
+    width: 28px; /* bigger */
+    height: 28px;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: none;
+    z-index: 1100;
+    opacity: 0.98;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 8px 18px rgba(255,45,85,0.12));
+  }
+  .heart svg { width:100%; height:100%; display:block; fill: var(--heart-color); }
+
+  /* smooth movement for NO when it becomes absolute */
+  #noBtn { transition: left 220ms cubic-bezier(.2,.9,.2,1), top 220ms cubic-bezier(.2,.9,.2,1); }
+
+  @media (max-width:760px){
+    .container{ flex-direction:column; align-items:center }
+    .card, .side{ width:92% }
+    .puzzle-frame{ width:260px; height:260px }
+    #puzzle{ gap:6px; padding:8px }
+    .tile{ background-size:260px 260px }
+    .previewWrap{ height:180px }
+  }
 </style>
 </head>
-
 <body>
 
-<h2>Picture Puzzle</h2>
+  <header>
+    <h1>Proposal Challenge Puzzle</h1>
+    <div class="subtitle">Solve the puzzles, reveal the moments, and get a special proposal.</div>
+  </header>
 
-<div id="timer">Time: 0 sec</div>
+  <div class="container">
+    <div class="card" aria-live="polite">
+      <div id="timer">Time: 00:00</div>
 
-<div id="puzzle"></div>
+      <!-- decorative frame around puzzle -->
+      <div class="puzzle-frame">
+        <div id="puzzle" aria-label="Sliding puzzle"></div>
+      </div>
 
-<div id="solution">
-<p>Solution Preview</p>
-<img id="solutionImg">
-</div>
+      <div class="controls">
+        <button id="restartBtn" class="mutedBtn">Restart Level</button>
+        <button class="hintBtn" onclick="showHint()">Hint / Answer</button>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="previewTitle">Preview</div>
+      <div class="previewWrap">
+        <img id="solutionImg" class="previewImg" alt="Puzzle preview image" src="">
+      </div>
+      <div class="meta" id="metaText">Solve 3 romantic puzzles to get a special proposal.</div>
+    </div>
+  </div>
+
+  <!-- Start modal -->
+  <div id="startModal" class="modal" style="display:flex;">
+    <div id="startCard" class="modalCard" role="dialog" aria-modal="true">
+      <h3>Challenge</h3>
+      <p>If you solve these 3 puzzles you will get a proposal from my side ❤️</p>
+      <div id="startBtns" style="position:relative; display:flex; gap:12px; justify-content:center; margin-top:12px; height:56px; align-items:center;">
+        <button id="yesBtn" class="yesBtn" onclick="startGame()">YES</button>
+        <button id="noBtn" class="noBtn">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hint modal -->
+  <div id="hintModal" class="modal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="hintTitle">
+      <h3 id="hintTitle">Hint Question</h3>
+      <p id="hintQuestion" style="color:#444;margin-bottom:8px"></p>
+      <input id="hintAnswer" class="input" placeholder="Type your answer here" />
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="yesBtn" onclick="submitHint()">Submit</button>
+        <button class="noBtn" onclick="closeHint()">Cancel</button>
+      </div>
+      <div id="hintFeedback" class="feedback" style="color:#b00020"></div>
+    </div>
+  </div>
+
+  <!-- Success modal -->
+  <div id="successModal" class="modal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true">
+      <div class="successTitle">🎉 Congratulations! 🎉</div>
+      <p style="color:#333">You passed all levels ❤️</p>
+      <h3 style="margin-top:6px;color:#222">Will you marry me?</h3>
+      <button class="proposalBtn" onclick="onAccept()">YES, I DO 💍</button>
+    </div>
+  </div>
 
 <script>
-
-const images=[
-
-"https://raw.githubusercontent.com/dbhushan03/MyTracker-/9029d98327fbfbe988b81ede3f7bab51cf79a8c0/WhatsApp%20Image%202026-03-06%20at%2011.00.18%20PM.jpeg",
-
-"https://picsum.photos/300?random=1",
-"https://picsum.photos/300?random=2",
-"https://picsum.photos/300?random=3"
-
+/* puzzles */
+const puzzles = [
+  { img: "https://raw.githubusercontent.com/dbhushan03/puzzle/main/puzzle1.jpeg", sound: "https://raw.githubusercontent.com/dbhushan03/puzzle/main/ReelAudio-33202.mp3", question: "First meet date", answer: "06" },
+  { img: "https://raw.githubusercontent.com/dbhushan03/puzzle/main/puzzle2.jpeg", sound: "https://raw.githubusercontent.com/dbhushan03/puzzle/main/ReelAudio-41431.mp3", question: "First day love start", answer: "07" },
+  { img: "https://raw.githubusercontent.com/dbhushan03/puzzle/main/puzzle3.jpeg", sound: "https://raw.githubusercontent.com/dbhushan03/puzzle/main/ReelAudio-49347.mp3", question: "Family accept", answer: "10" }
 ];
 
-let tiles=[];
-let blankIndex=8;
-let imgURL="";
-let seconds=0;
-let timerInterval;
+let puzzleIndex = 0;
+let tiles = [];
+let blankIndex = 8;
+let seconds = 0;
+let timerInterval = null;
 
-function startGame(){
-
-let randomIndex=Math.floor(Math.random()*images.length);
-imgURL=images[randomIndex];
-
-document.getElementById("solutionImg").src=imgURL;
-
-tiles=[];
-
-for(let i=0;i<9;i++){
-tiles.push(i);
-}
-
-shuffle();
-drawPuzzle();
-startTimer();
-}
-
+/* timer */
 function startTimer(){
-
-seconds=0;
-
-clearInterval(timerInterval);
-
-timerInterval=setInterval(function(){
-
-seconds++;
-
-document.getElementById("timer").innerText="Time: "+seconds+" sec";
-
-},1000);
-
+  clearInterval(timerInterval);
+  seconds = 0;
+  timerInterval = setInterval(()=>{
+    seconds++;
+    const m = Math.floor(seconds/60);
+    let s = seconds % 60;
+    if(s < 10) s = "0"+s;
+    document.getElementById('timer').innerText = `Time: ${m}:${s}`;
+  },1000);
 }
 
-function shuffle(){
-
-for(let i=tiles.length-2;i>0;i--){
-
-let j=Math.floor(Math.random()*(i+1));
-
-let temp=tiles[i];
-tiles[i]=tiles[j];
-tiles[j]=temp;
-
+/* start/close */
+function startGame(){
+  document.getElementById('startModal').style.display = 'none';
+  loadPuzzle(); // load current puzzleIndex (initially 0)
+}
+function closeStart(){
+  document.getElementById('startModal').style.display = 'none';
 }
 
-tiles[8]=8;
-blankIndex=tiles.indexOf(8);
+/* load puzzle (loads current puzzleIndex) */
+function loadPuzzle(){
+  // ensure puzzleIndex in range
+  if(puzzleIndex < 0) puzzleIndex = 0;
+  if(puzzleIndex >= puzzles.length){
+    showSuccess();
+    return;
+  }
 
+  const current = puzzles[puzzleIndex];
+  document.getElementById('solutionImg').src = current.img;
+
+  // play sound if allowed
+  const player = document.getElementById('bgMusic');
+  player.src = current.sound;
+  player.play().catch(()=>{});
+
+  // initialize tiles in solved order then shuffle
+  tiles = Array.from({length:9}, (_,i)=>i);
+  shuffleTiles();
+  drawPuzzle(current.img);
+  startTimer();
 }
 
-function drawPuzzle(){
+/* shuffle (shuffle first 8 tiles only) */
+function shuffleTiles(){
 
-const puzzle=document.getElementById("puzzle");
+  do{
+    for(let i=7;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+    }
+    tiles[8] = 8;
+  } while(!isSolvable(tiles));
 
-puzzle.innerHTML="";
-
-tiles.forEach((value,index)=>{
-
-let div=document.createElement("div");
-
-div.classList.add("tile");
-
-if(value===8){
-
-div.classList.add("blank");
-
-}else{
-
-let x=(value%3)*100;
-let y=Math.floor(value/3)*100;
-
-div.style.backgroundImage="url("+imgURL+")";
-div.style.backgroundPosition="-"+x+"px -"+y+"px";
-
+  blankIndex = tiles.indexOf(8);
 }
 
-div.onclick=function(){
-move(index);
-};
+function isSolvable(arr){
+  let inversions = 0;
 
-puzzle.appendChild(div);
+  for(let i=0;i<8;i++){
+    for(let j=i+1;j<9;j++){
+      if(arr[i] !== 8 && arr[j] !== 8 && arr[i] > arr[j]){
+        inversions++;
+      }
+    }
+  }
 
+  return inversions % 2 === 0;
+}
+
+/* draw puzzle with dynamic sizing */
+function drawPuzzle(img){
+  const puzzle = document.getElementById('puzzle');
+  puzzle.innerHTML = '';
+  const pw = puzzle.clientWidth;
+  const ph = puzzle.clientHeight;
+  const tileW = Math.floor(pw / 3);
+  const tileH = Math.floor(ph / 3);
+
+  tiles.forEach((value, index)=>{
+    const div = document.createElement('div');
+    div.className = 'tile';
+    div.style.position = 'relative';
+    if(value === 8){
+      div.classList.add('blank');
+    } else {
+      div.style.backgroundImage = `url(${img})`;
+      div.style.backgroundSize = `${pw}px ${ph}px`;
+      const sx = (value % 3) * tileW;
+      const sy = Math.floor(value / 3) * tileH;
+      div.style.backgroundPosition = `-${sx}px -${sy}px`;
+      // subtle overlay for warm vibe
+      const gloss = document.createElement('div');
+      gloss.className = 'tile-overlay';
+      div.appendChild(gloss);
+    }
+    div.addEventListener('click', ()=> moveTile(index, img));
+    puzzle.appendChild(div);
+  });
+}
+
+/* adjacency check */
+function isAdjacent(i, blank){
+  const ri = Math.floor(i/3), rj = Math.floor(blank/3);
+  const ci = i % 3, cj = blank % 3;
+  const dr = Math.abs(ri - rj);
+  const dc = Math.abs(ci - cj);
+  return (dr + dc) === 1;
+}
+
+/* move tile */
+function moveTile(i, img){
+  if(isAdjacent(i, blankIndex)){
+    [tiles[i], tiles[blankIndex]] = [tiles[blankIndex], tiles[i]];
+    blankIndex = i;
+    drawPuzzle(img);
+    checkWin();
+  }
+}
+
+/* check win */
+function checkWin(){
+  for(let i=0;i<9;i++){
+    if(tiles[i] !== i) return;
+  }
+  clearInterval(timerInterval);
+  puzzleIndex++;
+  setTimeout(()=> loadPuzzle(), 900);
+}
+
+/* hint modal */
+function showHint(){
+  if(puzzleIndex >= puzzles.length){ showSuccess(); return; }
+  const current = puzzles[puzzleIndex];
+  document.getElementById('hintQuestion').innerText = current.question;
+  document.getElementById('hintAnswer').value = '';
+  document.getElementById('hintFeedback').innerText = '';
+  document.getElementById('hintModal').style.display = 'flex';
+  setTimeout(()=> document.getElementById('hintAnswer').focus(), 120);
+}
+function closeHint(){ document.getElementById('hintModal').style.display = 'none'; }
+function submitHint(){
+  const current = puzzles[puzzleIndex];
+  const answer = document.getElementById('hintAnswer').value.trim();
+  const feedback = document.getElementById('hintFeedback');
+  if(answer === ''){ feedback.style.color = '#b00020'; feedback.innerText = 'Please enter an answer.'; return; }
+  if(answer === current.answer){
+    feedback.style.color = '#0a7a3a'; feedback.innerText = '✅ Correct! Level passed.';
+    clearInterval(timerInterval);
+    puzzleIndex++;
+    setTimeout(()=>{ closeHint(); loadPuzzle(); }, 900);
+  } else {
+    feedback.style.color = '#b00020'; feedback.innerText = '❌ Wrong answer. Try again!';
+  }
+}
+
+/* success & fireworks */
+function showSuccess(){
+  fireworks();
+  document.getElementById('successModal').style.display = 'flex';
+}
+function fireworks(){
+  const colors = ['#ff4d88','#ffd166','#ffb3d6','#6a11cb','#fff176'];
+  for(let i=0;i<80;i++){
+    const dot = document.createElement('div');
+    dot.className = 'firework';
+    dot.style.left = (Math.random()*100) + 'vw';
+    dot.style.top = (Math.random()*100) + 'vh';
+    dot.style.background = colors[Math.floor(Math.random()*colors.length)];
+    const dx = (Math.random()*300 - 150) + 'px';
+    const dy = (Math.random()*300 - 150) + 'px';
+    document.body.appendChild(dot);
+    dot.animate([
+      { transform: 'translate(0,0) scale(1)', opacity:1 },
+      { transform: `translate(${dx}, ${dy}) scale(0.2)`, opacity:0 }
+    ], { duration: 1200 + Math.random()*800, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    setTimeout(()=> dot.remove(), 2000);
+  }
+}
+
+/* restart: reshuffle current level and reset timer (do not change puzzleIndex) */
+function restartGame(){
+  // keep current puzzleIndex unchanged; if out of range, clamp
+  if(puzzleIndex < 0) puzzleIndex = 0;
+  if(puzzleIndex >= puzzles.length) puzzleIndex = puzzles.length - 1;
+  const current = puzzles[puzzleIndex];
+  tiles = Array.from({length:9}, (_,i)=>i);
+  shuffleTiles();
+  drawPuzzle(current.img);
+  startTimer();
+}
+
+/* accept */
+function onAccept(){
+  const modal = document.getElementById('successModal');
+  modal.querySelector('.modalCard').innerHTML = `
+    <div style="font-size:28px;color:var(--pink);font-weight:800;margin-bottom:8px">💖 She said YES! 💖</div>
+    <p style="color:#333;font-weight:600">Thank you for playing — a beautiful new chapter begins.✨</p>
+  `;
+  fireworks();
+}
+
+/* audio */
+const audio = document.createElement('audio');
+audio.id = 'bgMusic';
+audio.loop = true;
+document.body.appendChild(audio);
+
+/* initial */
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('startModal').style.display = 'flex';
+  document.getElementById('solutionImg').src = puzzles[0].img;
+  // wire restart button
+  document.getElementById('restartBtn').addEventListener('click', restartGame);
+  // start hearts animation
+  startHearts();
 });
 
+/* NO button dodge behavior
+   - NO stays inline beside YES by default
+   - only when the cursor approaches NO it becomes absolute and moves away
+   - when the cursor leaves the button area, NO returns to inline position
+*/
+(function setupNoDodge(){
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+  const container = document.getElementById('startBtns');
+
+  function setInline() {
+    noBtn.style.position = '';
+    noBtn.style.left = '';
+    noBtn.style.top = '';
+    noBtn.style.transform = '';
+    yesBtn.style.position = '';
+  }
+
+  function makeAbsoluteAtCurrent() {
+    const contRect = container.getBoundingClientRect();
+    const nbRect = noBtn.getBoundingClientRect();
+    const left = nbRect.left - contRect.left;
+    const top = nbRect.top - contRect.top;
+    noBtn.style.position = 'absolute';
+    noBtn.style.left = `${Math.max(0, Math.floor(left))}px`;
+    noBtn.style.top = `${Math.max(0, Math.floor(top))}px`;
+  }
+
+  function moveNoAway() {
+    if (noBtn.style.position !== 'absolute') makeAbsoluteAtCurrent();
+    const rect = container.getBoundingClientRect();
+    const padding = 8;
+    const maxX = Math.max(rect.width - noBtn.offsetWidth - padding, 0);
+    const maxY = Math.max(rect.height - noBtn.offsetHeight - padding, 0);
+    const yesRect = yesBtn.getBoundingClientRect();
+    const yesX = yesRect.left - rect.left;
+    let newX = Math.random() * maxX;
+    if (Math.abs(newX - yesX) < 80) {
+      newX = (yesX + 120) % (maxX || 120);
+    }
+    const newY = Math.random() * maxY;
+    noBtn.style.left = `${Math.max(0, Math.floor(newX))}px`;
+    noBtn.style.top = `${Math.max(0, Math.floor(newY))}px`;
+  }
+
+  const DODGE_THRESHOLD = 80;
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const nbRect = noBtn.getBoundingClientRect();
+    const nbx = nbRect.left - rect.left + nbRect.width / 2;
+    const nby = nbRect.top - rect.top + nbRect.height / 2;
+    const dx = mx - nbx;
+    const dy = my - nby;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < DODGE_THRESHOLD) {
+      moveNoAway();
+    }
+  });
+
+  noBtn.addEventListener('mouseenter', () => {
+    moveNoAway();
+  });
+
+  container.addEventListener('mouseleave', () => {
+    setTimeout(() => setInline(), 220);
+  });
+
+  noBtn.addEventListener('click', () => {
+    document.getElementById('startModal').style.display = 'none';
+  });
+
+  setTimeout(setInline, 50);
+  window.addEventListener('resize', () => setTimeout(setInline, 80));
+})();
+
+/* Hearts animation: spawn larger red hearts that float up and fade */
+function createHeart(x, y, scale = 1, color = getComputedStyle(document.documentElement).getPropertyValue('--heart-color') || '#ff2d55') {
+  const el = document.createElement('div');
+  el.className = 'heart';
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.style.opacity = 0.98;
+  el.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  el.innerHTML = `
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 21s-7.5-4.35-9.5-7.05C-0.5 9.9 3 5 7.5 6.5 9.2 7.1 10 9 12 11c2-2 2.8-3.9 4.5-4.5C21 5 24.5 9.9 21.5 13.95 19.5 16.65 12 21 12 21z"/>
+    </svg>
+  `;
+  // set fill color
+  el.querySelector('svg').style.fill = color;
+  document.body.appendChild(el);
+
+  const dx = (Math.random() * 120 - 60);
+  const dy = - (220 + Math.random() * 260);
+  const rotate = (Math.random() * 60 - 30);
+  const duration = 3200 + Math.random() * 2000;
+
+  el.animate([
+    { transform: `translate(-50%, -50%) translate(0,0) scale(${scale}) rotate(0deg)`, opacity:1 },
+    { transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(${scale * 0.6}) rotate(${rotate}deg)`, opacity:0 }
+  ], {
+    duration,
+    easing: 'cubic-bezier(.2,.8,.2,1)'
+  });
+
+  setTimeout(()=> el.remove(), duration + 50);
 }
 
-function move(i){
+let heartsInterval = null;
+function startHearts(){
+  heartsInterval = setInterval(()=>{
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const x = Math.random() * vw;
+    const y = vh - 20 - Math.random() * 40;
+    createHeart(x, y, 1.0 + Math.random()*0.6, '#ff2d55');
+  }, 600);
 
-const validMoves=[i-1,i+1,i-3,i+3];
-
-if(validMoves.includes(blankIndex)){
-
-let temp=tiles[i];
-tiles[i]=tiles[blankIndex];
-tiles[blankIndex]=temp;
-
-blankIndex=i;
-
-drawPuzzle();
-
-checkWin();
+  document.addEventListener('click', (e)=>{
+    for(let i=0;i<4;i++){
+      setTimeout(()=> createHeart(e.clientX + (Math.random()*40-20), e.clientY + (Math.random()*40-20), 0.9 + Math.random()*0.8, '#ff2d55'), i*60);
+    }
+  });
 }
 
+function stopHearts(){
+  clearInterval(heartsInterval);
 }
 
-function checkWin(){
-
-for(let i=0;i<9;i++){
-
-if(tiles[i]!==i){
-return;
-}
-
-}
-
-clearInterval(timerInterval);
-
-setTimeout(function(){
-
-drawSolved();
-
-alert("🎉 Puzzle Solved in "+seconds+" seconds!");
-
-},200);
-
-}
-
-function drawSolved(){
-
-const puzzle=document.getElementById("puzzle");
-
-puzzle.innerHTML="";
-
-for(let i=0;i<9;i++){
-
-let div=document.createElement("div");
-
-div.classList.add("tile");
-
-let x=(i%3)*100;
-let y=Math.floor(i/3)*100;
-
-div.style.backgroundImage="url("+imgURL+")";
-div.style.backgroundPosition="-"+x+"px -"+y+"px";
-
-puzzle.appendChild(div);
-
-}
-
-}
-
-startGame();
-
+/* redraw puzzle on resize so tile background-size stays correct */
+window.addEventListener('resize', ()=>{
+  if(puzzleIndex < puzzles.length){
+    const current = puzzles[puzzleIndex];
+    drawPuzzle(current.img);
+  }
+});
 </script>
-
 </body>
 </html>
